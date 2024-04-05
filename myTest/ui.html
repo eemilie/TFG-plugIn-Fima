@@ -1,0 +1,40 @@
+<html>
+<head>
+  <title>My Test</title>
+</head>
+<body>
+  <div>
+    <legend>Dark patterns</legend>
+    <h2>DARK PATTERNS DETECTION</h2>
+    <p>
+      Seleccionar un frame para empezar la detection
+    </p>
+    <div id="error-msg" style="color: red; margin-bottom: 10px;"></div> <!-- Elemento para mostrar el mensaje de error -->
+    <button id="cancel">Cancel</button>
+    <button id="next">Next</button>
+  </div>
+
+  <script>
+    // Manejar el clic en el botón 'cancel'
+    document.getElementById('cancel').onclick = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'actionExit' } }, '*');
+    };
+
+    // Manejar el clic en el botón 'Next'
+    document.getElementById('next').onclick = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'next-page' } }, '*');
+    };
+
+    onmessage = (msg) => {
+      console.log("MESMES"+msg.data.pluginMessage);
+      if (!msg.data.pluginMessage) {
+        document.getElementById('error-msg').innerText = 'Por favor, selecciona un frame para analizar.';
+      } else {
+        document.getElementById('error-msg').innerText = ''; 
+      }
+    };
+
+  </script>
+
+</body>
+</html>
