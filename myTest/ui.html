@@ -1,13 +1,13 @@
 <html>
 <head>
-  <title>My Test</title>
+  <title>Mi TFG</title>
 </head>
 <body>
   <div>
     <legend>Dark patterns</legend>
-    <h2>DARK PATTERNS DETECTION</h2>
+    <h2>DARK PATTERNS (POP UP) DETECTION</h2>
     <p>
-      Seleccionar un frame para empezar la detection
+      Seleccionar un frame para empezar la detection.
     </p>
     <div id="error-msg" style="color: red; margin-bottom: 10px;"></div> <!-- Elemento para mostrar el mensaje de error -->
     <button id="cancel">Cancel</button>
@@ -24,12 +24,22 @@
     document.getElementById('next').onclick = (event) => {
       parent.postMessage({ pluginMessage: { type: 'next-page' } }, '*');
     };
+    /*
+    // Manejar el clic en el botón 'Next'
+    document.getElementById('nextImage').onclick = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'next-page-image' } }, '*');
+    };
+    */
 
-    onmessage = (msg) => {
+    window.onmessage = async (msg) => {
       console.log("MESMES"+msg.data.pluginMessage);
       if (!msg.data.pluginMessage) {
         document.getElementById('error-msg').innerText = 'Por favor, selecciona un frame para analizar.';
-      } else {
+      }
+      else if (msg.data.pluginMessage === 2){
+        document.getElementById('error-msg').innerText = 'Por favor, selecciona un frame para analizar. Otros tipos no son validos.';
+      } 
+      else if (msg.data.pluginMessage === 0){
         document.getElementById('error-msg').innerText = ''; 
       }
     };
@@ -37,4 +47,47 @@
   </script>
 
 </body>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+  }
+  .container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  h1 {
+    margin-top: 0;
+    color: #333;
+  }
+  p {
+    margin-bottom: 20px;
+    color: #666;
+  }
+  #error-msg {
+    color: red;
+    margin-bottom: 10px;
+  }
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+  button + button {
+    margin-left: 10px;
+  }
+</style>
 </html>

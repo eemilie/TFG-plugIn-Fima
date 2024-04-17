@@ -23,58 +23,35 @@ figma.showUI(__html__, { width: 300, height: 400 });
 figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
     // verificacion del mensaje recibido
     if (msg.type === 'next-page') {
-        console.log("HELLO WE WANT A NEXT PAGE");
-        let ejReal = false;
-        let imageData = null;
+        console.log("HELLO WE WANT A NEXT PAGE NUEVO esgbaerbgerab");
         // Get the selected frame
         const selectedFrame = figma.currentPage.selection[0];
         // Check if a frame is selected
         if (!selectedFrame) {
-            console.error('Please select a frame to analyze.');
-            //parent.postMessage({ pluginMessage: { type: 'error', message: 'Please select a frame to analyze.' } }, '*');
+            console.error('Por favor seleccione un frame para analizar.');
             figma.ui.postMessage(0);
             return;
         }
-        // Check if the selected node is a frame
-        else if (selectedFrame.type !== 'FRAME') {
-            console.error('Please select a frame. Other node types are not supported.' + selectedFrame.type);
-            figma.ui.postMessage(0);
+        if (selectedFrame.type !== 'FRAME') {
+            console.error('Por favor seleccione un framepara analizar. Otros tipos no son validos.' + selectedFrame.type);
+            figma.ui.postMessage(2);
             return;
-        }
-        else if (selectedFrame.type === 'FRAME' && selectedFrame.children.length === 1 && isAbsolutePositioned(selectedFrame.children[0])) {
-            console.log("PUEDE LLEGAR A SER UNA IMAGEN");
-            ejReal = true;
-            testImage(selectedFrame.children[0]);
         }
         else {
             console.log("good");
             figma.ui.postMessage(1);
-        }
-        if (ejReal) {
-            const getSelected = () => __awaiter(void 0, void 0, void 0, function* () {
-                for (const node of figma.currentPage.selection) {
-                    // @ts-ignore
-                    for (const paint of node.fills) {
-                        if (paint.type === 'IMAGE') {
-                            // Get the (encoded) bytes for this image.
-                            const bytes = yield node.exportAsync();
-                            figma.ui.postMessage({ type: 'upload', image: bytes });
-                        }
-                    }
-                }
-            });
         }
         // create the frame and name it: 
         const parentFrame = figma.createFrame();
         parentFrame.name = 'Next Page';
         // Add Layout to the frame an set the direction, set the background color,  padding and spacing and sizng mode
         parentFrame.layoutMode = "VERTICAL";
-        parentFrame.resize(400, 600);
-        //parentFrame.backgrounds = [{ type: 'SOLID', color: { r: 0.7, g: 0.3, b: 0.2} }];   
+        parentFrame.resize(550, 350);
+        //parentFrame.backgrounds = [{ type: 'SOLID', color: { r: 0.7, g: 0.9, b: 1} }];   
         parentFrame.primaryAxisSizingMode = 'FIXED';
         parentFrame.counterAxisSizingMode = 'FIXED';
+        // ANALIZAR IAMGEN + RESULTADOS
         const analysisResult = analyzeShapes(selectedFrame);
-        // Display message in Figma UI
         console.log("MESSSSSSSSSSSSSSSS:" + analysisResult);
         // text Node for the title 
         const textNodeTitle = figma.createText();
@@ -84,7 +61,7 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
         figma.loadFontAsync({ family: "Inter", style: "Regular" })
             .then(() => {
             // Creation of the textNode Title: 
-            textNodeTitle.characters = "ANALYSIS RESULTS:";
+            textNodeTitle.characters = "ANALYSIS RESULTS: \n";
             textNodeTitle.x = 20; // Set horizontal position 
             textNodeTitle.y = 20; // Set vertical position 
             textNodeTitle.fontSize = 24; // Set font size 
@@ -109,7 +86,7 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
         figma.closePlugin("closed with actionExit");
     }
 });
-function analyzeShapes(selectedFrame, real) {
+function analyzeShapes(selectedFrame) {
     let largestShape = null;
     let mess = null;
     let hasText = false;
@@ -169,7 +146,7 @@ function analyzeShapes(selectedFrame, real) {
         mess = 'All good! No potential dark patterns detected.';
         console.log(mess);
     }
-    return 'Analysis complete! Results:' + mess;
+    return 'Analysis complete! \nResults:' + mess;
 }
 function checkShapeOverlapsText(shape, frame) {
     // Simplified example using x, y, width, and height for basic overlap check
@@ -193,17 +170,4 @@ function checkShapeOverlapsText(shape, frame) {
         }
     }
     return false;
-}
-function isAbsolutePositioned(node) {
-    return node.relativeTransform[0][0] === 1 && // Check for FIXED positioning
-        node.relativeTransform[1][1] === 1;
-}
-function testImage(selected) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // Export a 2x resolution PNG of the node
-        const bytes = yield selected.exportAsync({
-            format: 'PNG',
-            constraint: { type: 'SCALE', value: 1 },
-        });
-    });
 }
